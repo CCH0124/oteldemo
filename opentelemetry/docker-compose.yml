@@ -1,0 +1,109 @@
+version: '3.7'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.6.0
+    container_name: elasticsearch
+    volumes:
+      - type: bind
+        source: ./elasticsearch/config/elasticsearch.yml
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
+        read_only: true
+      - type: volume
+        source: elasticsearch_pv
+        target: /usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    restart: unless-stopped
+    environment:
+      ES_JAVA_OPTS: "-Xms512m -Xms512m"
+    networks:
+      - otel
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - otel
+
+  query:
+    container_name: jaeger_query
+    image: jaegertracing/jaeger-query
+    environment:
+      - SPAN_STORAGE_TYPE=elasticsearch
+      - ES_SERVER_URLS=http://elasticsearch:9200
+      - ES_TAGS_AS_FIELDS_ALL=true
+      - LOG_LEVEL=debug
+    ports:
+      - 16686:16686
+    restart: on-failure
+    networks:
+      - otel
+    depends_on:
+      - elasticsearch
+  collector:
+    container_name: jaeger_collector
+    image: jaegertracing/jaeger-opentelemetry-collector
+    environment:
+      - SPAN_STORAGE_TYPE=elasticsearch
+      - LOG_LEVEL=debug
+    command: [
+      "--es.server-urls=http://elasticsearch:9200",
+      "--es.num-shards=2",
+      "--es.num-replicas=0"
+    ]
+    expose:
+      - 14267
+      - 14268
+      - 14250
+    restart: on-failure
+    networks:
+      - otel
+    depends_on:
+      - elasticsearch
+
+  otel-collector:
+    image: ${OTELCOL_IMG}
+    command: ["--config=/etc/otel-collector-config.yaml", "${OTELCOL_ARGS}"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "1888:1888"   # pprof extension
+      - "8888:8888"   # Prometheus metrics exposed by the collector
+      - "8889:8889"   # Prometheus exporter metrics
+      - "13133:13133" # health_check extension
+      - "4317"        # OTLP gRPC receiver
+      - "55670:55679" # zpages extension
+    restart: on-failure
+    networks:
+      - otel 
+  otel-agent:
+    image: ${OTELCOL_IMG}
+    command: ["--config=/etc/otel-agent-config.yaml", "${OTELCOL_ARGS}"]
+    volumes:
+      - ./otel-agent-config.yaml:/etc/otel-agent-config.yaml
+    ports:
+      - "8887:8888"   # Prometheus metrics exposed by the agent
+      - "14250"       # Jaeger grpc receiver
+      - "14268"       # Jaeger http thrift receiver
+      - "55678"       # OpenCensus receiver
+      - "4317:4317"        # OTLP gRPC receiver
+      - "1777:1777"   # pprof extension
+      - "55679:55679" # zpages extension
+      - "13133"       # health_check
+    depends_on:
+      - otel-collector
+    networks:
+      - otel
+
+volumes:
+  elasticsearch_pv: {}
+
+
+networks:
+  otel:
+    driver: bridge
+
