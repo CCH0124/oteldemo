@@ -1,4 +1,5 @@
 package com.otel.example.oteldemo.model;
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -30,7 +31,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor    
-public class Note {
+public class Note implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
