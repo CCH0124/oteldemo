@@ -30,7 +30,7 @@ import lombok.NoArgsConstructor;
         allowGetters = true)
 @Data
 @AllArgsConstructor
-@NoArgsConstructor    
+@NoArgsConstructor 
 public class Note implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

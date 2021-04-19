@@ -15,31 +15,32 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
 
-@RequestMapping("/api")
+@RestController
+@RequestMapping("/api/")
 public class NoteController {
     @Autowired
     NoteRepository noteRepository;
 
-    @GetMapping("/notes")
+    @GetMapping("notes")
     public List<Note> getAllNotes() {
         return noteRepository.findAll();
     }
 
-    @PostMapping("/notes")
+    @PostMapping("notes")
     public Note createNote(@Valid @RequestBody Note note) {
         return noteRepository.save(note);
     }
 
-    @GetMapping("/notes/{id}")
+    @GetMapping("notes/{id}")
     public Note getNoteById(@PathVariable(value = "id") Long noteId) {
         return noteRepository.findById(noteId)
                 .orElseThrow(() -> new ResourceNotFoundException("Note", "id", noteId));
     }
 
-    @PutMapping("/notes/{id}")
+    @PutMapping("notes/{id}")
     public Note updateNote(@PathVariable(value = "id") Long noteId,
                                            @Valid @RequestBody Note noteDetails) {
 
@@ -53,7 +54,7 @@ public class NoteController {
         return updatedNote;
     }
 
-    @DeleteMapping("/notes/{id}")
+    @DeleteMapping("notes/{id}")
     public ResponseEntity<?> deleteNote(@PathVariable(value = "id") Long noteId) {
         Note note = noteRepository.findById(noteId)
                 .orElseThrow(() -> new ResourceNotFoundException("Note", "id", noteId));
