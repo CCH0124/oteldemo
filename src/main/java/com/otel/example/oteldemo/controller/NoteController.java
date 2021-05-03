@@ -4,8 +4,9 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import com.otel.example.oteldemo.repository.NoteRepository;
+
 import com.otel.example.oteldemo.model.Note;
+import com.otel.example.oteldemo.service.NoteService;
 import com.otel.example.oteldemo.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,51 +17,56 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/api/")
 public class NoteController {
     @Autowired
-    NoteRepository noteRepository;
+    NoteService noteService;
 
     @GetMapping("notes")
     public List<Note> getAllNotes() {
-        return noteRepository.findAll();
+        return this.noteService.getAllNote();
     }
 
     @PostMapping("notes")
-    public Note createNote(@Valid @RequestBody Note note) {
-        return noteRepository.save(note);
+    public void createNote(@Valid @RequestBody Note note) {
+        this.noteService.saveNote(note);
     }
 
     @GetMapping("notes/{id}")
-    public Note getNoteById(@PathVariable(value = "id") Long noteId) {
-        return noteRepository.findById(noteId)
-                .orElseThrow(() -> new ResourceNotFoundException("Note", "id", noteId));
+    public ResponseEntity<Note> getNoteById(@PathVariable(value = "id") Long noteId) {
+        try {
+            Note note = this.noteService.getNoteById(noteId);
+            if (note == null){
+                return new ResponseEntity<Note>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<Note>(note, HttpStatus.OK);
+        } catch (Exception e) {
+            //TODO: handle exception
+            return new ResponseEntity<Note>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @PutMapping("notes/{id}")
-    public Note updateNote(@PathVariable(value = "id") Long noteId,
-                                           @Valid @RequestBody Note noteDetails) {
-
-        Note note = noteRepository.findById(noteId)
-                .orElseThrow(() -> new ResourceNotFoundException("Note", "id", noteId));
-
-        note.setTitle(noteDetails.getTitle());
-        note.setContent(noteDetails.getContent());
-
-        Note updatedNote = noteRepository.save(note);
-        return updatedNote;
+    public ResponseEntity<?> updateNote(@PathVariable(value = "id") Long noteId) {
+        try {
+            Note note = this.noteService.getNoteById(noteId);
+            if (note == null){
+                return new ResponseEntity<Note>(HttpStatus.NOT_FOUND);
+            }
+            this.noteService.saveNote(note);
+            return new ResponseEntity<Note>(HttpStatus.OK);
+        } catch (Exception e) {
+            //TODO: handle exception
+            return new ResponseEntity<Note>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @DeleteMapping("notes/{id}")
-    public ResponseEntity<?> deleteNote(@PathVariable(value = "id") Long noteId) {
-        Note note = noteRepository.findById(noteId)
-                .orElseThrow(() -> new ResourceNotFoundException("Note", "id", noteId));
-
-        noteRepository.delete(note);
-
-        return ResponseEntity.ok().build();
+    public void deleteNote(@PathVariable(value = "id") Long noteId) {
+        this.noteService.deleteNoteById(noteId);
     }
 }
