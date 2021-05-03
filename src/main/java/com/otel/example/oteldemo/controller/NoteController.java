@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-
 import com.otel.example.oteldemo.model.Note;
 import com.otel.example.oteldemo.service.NoteService;
 import com.otel.example.oteldemo.exception.ResourceNotFoundException;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -40,12 +40,12 @@ public class NoteController {
     public ResponseEntity<Note> getNoteById(@PathVariable(value = "id") Long noteId) {
         try {
             Note note = this.noteService.getNoteById(noteId);
-            if (note == null){
+            if (note == null) {
                 return new ResponseEntity<Note>(HttpStatus.NOT_FOUND);
             }
             return new ResponseEntity<Note>(note, HttpStatus.OK);
         } catch (Exception e) {
-            //TODO: handle exception
+            // TODO: handle exception
             return new ResponseEntity<Note>(HttpStatus.NOT_FOUND);
         }
     }
@@ -54,13 +54,13 @@ public class NoteController {
     public ResponseEntity<?> updateNote(@PathVariable(value = "id") Long noteId) {
         try {
             Note note = this.noteService.getNoteById(noteId);
-            if (note == null){
+            if (note == null) {
                 return new ResponseEntity<Note>(HttpStatus.NOT_FOUND);
             }
             this.noteService.saveNote(note);
             return new ResponseEntity<Note>(HttpStatus.OK);
         } catch (Exception e) {
-            //TODO: handle exception
+            // TODO: handle exception
             return new ResponseEntity<Note>(HttpStatus.NOT_FOUND);
         }
     }
