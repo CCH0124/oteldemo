@@ -6,7 +6,6 @@ import javax.validation.Valid;
 
 import com.otel.example.oteldemo.model.Note;
 import com.otel.example.oteldemo.service.NoteService;
-import com.otel.example.oteldemo.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
