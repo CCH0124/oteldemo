@@ -3,6 +3,18 @@
 3. [lightstep 教學](https://opentelemetry.lightstep.com/java/)
 4. [opentelemetry JAVA 教學](https://opentelemetry.io/docs/java/manual_instrumentation/)
 
+## Resources 
+
+在 OpenTelemetry 中，服務由**資源**描述，資源是在應用程式啟動期間初始化 OpenTelemetry SDK 時設置的。詳細規範可點擊此[鏈結](https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/resource/semantic_conventions#resource-semantic-conventions)。
+
+|Attribute|Description|Example|Required|
+|---|---|---|---|
+|service.name|給予服務的額外名稱。對於水平擴展服務的所有實例，必須相同|oteldemo|Y|
+|service.version|定義服務 API 或服務版本|aip:1.2.3|N|
+|host.hostname|主機名或以域名表示|oteldemo.com.tw|N|
+
+目前只能使用環境變數方式進行設置 `OTEL_RESOURCE_ATTRIBUTES`。這些的設定都是為了讓後端能夠進一步的識別分析。
+
 ## Span 
 `Span` 是組成 `Tracer` 的單位。
 ### SpanContext
