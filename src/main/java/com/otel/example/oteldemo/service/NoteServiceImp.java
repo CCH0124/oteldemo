@@ -17,7 +17,6 @@ import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.StatusCode;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Scope;
-import io.opentelemetry.extension.annotations.WithSpan;
 
 @Service
 public class NoteServiceImp implements NoteService {
@@ -32,12 +31,12 @@ public class NoteServiceImp implements NoteService {
     }
 
     @Override
-    @WithSpan
     public void saveNote(Note note) {
         // TODO Auto-generated method stub
         Span span = tracer.spanBuilder("saveNote").startSpan();
         try (Scope scope = span.makeCurrent()) {
             this.noteRepository.save(note);
+            span.setAttribute("CreateTime", note.getCreatedAt().toString());
             span.addEvent("Request.query", Attributes.of(AttributeKey.stringKey("content"), note.getContent(),AttributeKey.stringKey("title"), note.getTitle()));
         } catch (Throwable t) {
             span.setStatus(StatusCode.ERROR, "Change it to your error message");
