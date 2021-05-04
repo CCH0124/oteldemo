@@ -1,20 +1,22 @@
 1. [@Controller vs @RestController](https://javarevisited.blogspot.com/2017/08/difference-between-restcontroller-and-controller-annotations-spring-mvc-rest.html#axzz6sRNhPjm3)
 2. [Tracing API](https://github.com/open-telemetry/opentelemetry-specification/blob/0.3/specification/api-tracing.md#set-attributes)
+3. [lightstep 教學](https://opentelemetry.lightstep.com/java/)
+4. [opentelemetry JAVA 教學](https://opentelemetry.io/docs/java/manual_instrumentation/)
 
 ## Span 
-Span 是組成 Tracer 的單位。
+`Span` 是組成 `Tracer` 的單位。
 ### SpanContext
-為了要有完整 Tracer 的過程，每個 Span 要將 SpanContext 傳遞至子 Span。
+為了要有完整 `Tracer` 的過程，每個 `Span` 要將 `SpanContext` 傳遞至子 `Span。`
 
-SpanContext 透過 span_ID 告知子 span 誰是父，以及它屬於什麼 Tracer（trace_ID）。
+`SpanContext` 透過 `span_ID` 告知子 `span` 誰是父，以及它屬於什麼 `Tracer`（trace_ID）。
 ### Attributes
-由 `Key-value` 組成，提供 Span 詳細的資訊。可以查詢、分組或以其他方式分析 trace 和 span。
+由 `Key-value` 組成，提供 `Span` 詳細的資訊。可以查詢、分組或以其他方式分析 `trace` 和 `span`。
 ##### Status
 可將其設定為 `OK`、`Cancelled` 或 `Permission Denied`。
 ##### SpanKind
-SpanKind 在 Tracer 中提供有用訊息，此 Span 是否為遠端系統? SpanKind 值可以為 `CLIENT`、`SERVER`、`PRODUCER`、`CONSUMER` 和 `INTERNAL`。
+`SpanKind` 在 `Tracer` 中提供有用訊息，此 `Span` 是否為遠端系統? `SpanKind` 值可以為 `CLIENT`、`SERVER`、`PRODUCER`、`CONSUMER` 和 `INTERNAL`。
 ### Events
-包含名稱、時間戳和可選的 `Attributes` 集合等。其表示在 Span 工作負載內的特定時間發生所發生的事件。可能如下
+包含名稱、時間戳和可選的 `Attributes` 集合等。其表示在 `Span` 工作負載內的特定時間發生所發生的事件。可能如下
 
 ```
 events: 
@@ -25,7 +27,7 @@ message: "retrieved 400 records"
 ```
 ## 程式碼實現概念
 ### Annotation @WithSpan
-每次調用帶註釋的方法時，它會在當前 Trace 中創建一個子 Span，並記錄所有引發的異常。
+每次調用帶註釋的方法時，它會在當前 `Trace` 中創建一個子 `Span，並記錄所有引發的異常。
 
 也可以透過 `exclude`，排除一些不要的場景。
 
@@ -52,21 +54,21 @@ Span span = Span.current()
 
 ### Create own spans
 
-當創建自己的 Span。這些範圍將自動成為當前範圍的子，同時新增至 `Tracer` 中。Span 管理包括三個步驟：開始 Span、設置為當前 Span 和結束 Span。當前如果存在 Span，OpenTelemetry 會將其創建為當前 Span 的子。會在 `Tracer` 上調用 `spanBuilder` 方法以觸發一個新的 `Tracer`。創建新的 Span 後，使用 `Scope` 建立一個新的代碼區塊，當中會包含子 Span。在該範圍內對 `Span.current()` 的任何調用都將回傳該子 Span，而不是請求的父 Span。都完成後，需呼叫 `end()` 方法來關閉 Span，否則會有洩漏問題。
+當創建自己的 Span。這些範圍將自動成為當前範圍的子，同時新增至 `Tracer` 中。`Span` 管理包括三個步驟：開始 `Span`、設置為當前 `Span` 和結束 `Span`。當前如果存在 `Span`，`OpenTelemetry` 會將其創建為當前 `Span` 的子。會在 `Tracer` 上調用 `spanBuilder` 方法以觸發一個新的 `Tracer`。創建新的 `Span` 後，使用 `Scope` 建立一個新的代碼區塊，當中會包含子 `Span`。在該範圍內對 `Span.current()` 的任何調用都將回傳該子 `Span`，而不是請求的父 `Span`。都完成後，需呼叫 `end()` 方法來關閉 `Span`，否則會有洩漏問題。
 
 ### Error Handling
 
-在 OpenTelemetry 中，異常記錄為事件。但是，為確保異常的格式正確，應使用 `span.recordException(error)` 方法而非 `addEvent`。
+在 `OpenTelemetry` 中，異常記錄為事件。但是，為確保異常的格式正確，應使用 `span.recordException(error)` 方法而非 `addEvent`。
 
 ```java
 childSpan.recordException(new RuntimeException("oops"));
 childSpan.setStatus(StatusCode.ERROR);
 ```
-在 OpenTelemetry 中，錯誤表示整體操作未完成。當異常被處理並不表示著整個操作都無法完成。為了示意操作失敗，需調用 `span.setStatus()` 並傳入錯誤代碼，該代碼可讓分析工具來自動觸發警報、測量錯誤率等。
+在 `OpenTelemetry` 中，錯誤表示整體操作未完成。當異常被處理並不表示著整個操作都無法完成。為了示意操作失敗，需調用 `span.setStatus()` 並傳入錯誤代碼，該代碼可讓分析工具來自動觸發警報、測量錯誤率等。
 
 ## 實作
 
-使用 `Annotation` 方式，此方式會建立一個 Span，而此 Span 會是觸發該 Span 的子 Span，我們這邊設置了屬性(setAttribute)和事件(event)這會以 Log 方式呈現。
+使用 `Annotation` 方式，此方式會建立一個 `Span`，而此 `Span` 會是觸發該 `Span` 的子 `Span`，我們這邊設置了屬性(setAttribute)和事件(event)這會以 `Log` 方式呈現。
 ```java
     @WithSpan
     public static void requestValueSpan(Note note) {
