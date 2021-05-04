@@ -3,6 +3,111 @@
 3. [lightstep 教學](https://opentelemetry.lightstep.com/java/)
 4. [opentelemetry JAVA 教學](https://opentelemetry.io/docs/java/manual_instrumentation/)
 
+# Opentelemtry
+## Opentelemtry 介紹
+官方說 OpenTelemetry is a collection of tools, APIs, and SDKs. You can use it to instrument, generate, collect, and export telemetry data (metrics, logs, and traces) for analysis in order to understand your software's performance and behavior.
+
+為了方便分析軟體性能與行為。
+
+其支持的語言有
+- JAVA
+- C#
+- Go
+- javascript
+- Python
+- Rust
+- C++
+- Erlang/Elixir
+
+支持的組件
+- MySQL
+- Redis
+- Django
+- Grpc
+- Kafka
+- Jetty
+- Akka
+- RabbitMQ
+- Spring
+- Flask
+- net/http
+- gorilla/mux
+- WSG
+- JDBC
+- PostgreSQL
+
+其第一個穩定版本於 2021/02 發布，預計下半年完成 Metric 部分。
+
+## Opentelemtry 組件
+- proto
+    - 定義數據
+- Specification
+    - 有 API、SDK、Data
+    - API: 用於生成數據。為每個數據源以及其他方面像是 baggage 和 propagators 定義。
+    - SDK: 具有處理和導出功能的 API 實現。為每個數據源以及其他方面像是資源和配置定義。
+    - 定義語義約定以提供與供應商無關的實現以及 OpenTelemetry 協議（OTLP）。
+- Collector
+    - 接收、處裡和導出數據
+    - 支援發送到一個或多個開源或商業後端的開源可觀察性數據格式，例如 Jaeger、Prometheus 等
+- Instrumentation Libraries
+    - 蒐集不同組件的數據
+
+![](https://blog.newrelic.com/wp-content/uploads/opentelemetry_architecture-768x671.jpeg)
+
+### API
+可將 API 分成以下
+1. A Tracer API
+2. A Metrics API
+3. A Context API
+4. A set of semantic conventions
+
+##### Trace
+
+Trace API 會產生 Span，而 Span 會是該 Trace 中所做的操作，表示 Trace 中連續的操作。在 Span 中會給予一個 traceId，當中可為帶有時間戳的事件進行其它訊息的添加。
+
+##### Metric
+
+[Metric API](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md) 提供各式各樣類型的度量存取，像是 Counters、Observers。可在 Span 上下文中觀察當前 CPU 負載和 Disk 資訊等。可參考官方的[資訊](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#the-instruments)
+
+##### Context
+
+添加上下文的訊息，像是 [W3C Trace Context](https://www.w3.org/TR/trace-context/), Zipkin B3 headers等。此外，此 API 允許追蹤 Span 如何在系統中傳播。隨著trace 從一個行程傳播到下一個行程，上下文也會更新。度量工具不論何時都可以訪問當前上下文。
+
+##### Semantic conventions
+
+在 OpenTelemetry API 中包含一組[語義約定](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/overview.md)，當中包含了命名 Span、屬性以及錯誤關聯至 Span 的準則和規則。藉由在API 規範中對此進行編程，OpenTelemetry 可確保所有工具（無論作者或語言）都包含相同的語義訊息。
+
+### SDK
+
+OpenTelemetry SDK 是 OpenTelemetry API 的實現。基本上由三個組件組成
+- a Tracer
+- a Meter
+- and a shared Context layer that ties it all together
+
+![](https://blog.newrelic.com/wp-content/uploads/opentelemetry_sdk-768x555.jpg)
+
+原則上 SDK 能夠滿足現有的需求，但這可以進行改動。
+
+##### Tracer pipeline
+
+![](https://blog.newrelic.com/wp-content/uploads/opentelemetry_tracer-298x416.jpg)
+
+### Collector
+![](https://blog.newrelic.com/wp-content/uploads/opentelemetry_collector-768x427.jpeg)
+
+![](https://raw.github.com/open-telemetry/opentelemetry.io/main/iconography/Otel_Collector.svg)
+
+Receivers 會是數據的入口，它是 push 和 pull 模式，客戶端可以發送數據，或是以主動方式拉取數據。
+Exporters 是出口，將數據丟至後端，同時也是 push 和 pull 模式
+Processors 是一個管道的設置，是一個中間組間，可運行數據的處裡
+Extensions 是其它的組件
+
+## Opentelemtry 架構
+
+![](https://raw.github.com/open-telemetry/opentelemetry.io/main/iconography/Reference_Architecture.svg)
+
+左邊和右邊是不一樣的佈署方式。
+
 ## Resources 
 
 在 OpenTelemetry 中，服務由**資源**描述，資源是在應用程式啟動期間初始化 OpenTelemetry SDK 時設置的。詳細規範可點擊此[鏈結](https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/resource/semantic_conventions#resource-semantic-conventions)。
