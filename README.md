@@ -131,7 +131,7 @@ Extensions 是其它的組件
 ##### Status
 可將其設定為 `OK`、`Cancelled` 或 `Permission Denied`。
 ##### SpanKind
-`SpanKind` 在 `Tracer` 中提供有用訊息，此 `Span` 是否為遠端系統? `SpanKind` 值可以為 `CLIENT`、`SERVER`、`PRODUCER`、`CONSUMER` 和 `INTERNAL`。
+`SpanKind` 在 `Tracer` 中提供有用訊息，此 `Span` 是否為遠端系統? `SpanKind` 值可以為 `CLIENT`、`SERVER`、`PRODUCER`、`CONSUMER` 和 `INTERNAL`。詳細可參考官方[鏈結](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md#spankind)
 ### Events
 包含名稱、時間戳和可選的 `Attributes` 集合等。其表示在 `Span` 工作負載內的特定時間發生所發生的事件。可能如下
 
