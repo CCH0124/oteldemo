@@ -220,6 +220,33 @@ private final Tracer tracer = GlobalOpenTelemetry.getTracer(NoteServiceImp.class
 
 ![](image/custom-span.png)
 
+建立父子關係的 `Span`，在 child 方法中呼叫 `setParent`。
+
+```java
+    private static void parent() {
+        Span parentSpan = tracer.spanBuilder("parent").startSpan();
+        try {
+            parentSpan.addEvent("parent", Attributes.of(AttributeKey.stringKey("parent"), "parent"));
+            child(parentSpan);
+        } finally {
+            parentSpan.end();
+        }
+    }
+
+    private static void child(Span span) {
+        Span childSpan = tracer.spanBuilder("child").setParent(Context.current().with(span)).startSpan();
+        try (Scope scope = childSpan.makeCurrent()) {
+            childSpan.setAttribute("name", "child");
+        } catch (Exception e) {
+            // TODO: handle exception
+        } finally {
+            childSpan.end();
+        }
+    }
+```
+
+![](image/custom-parent-child-span.png)
+
 ## 設定 optntelemtry agent
 在 lunch.json 中設定 `vmArgs`
 ```java
