@@ -1,7 +1,4 @@
-1. [@Controller vs @RestController](https://javarevisited.blogspot.com/2017/08/difference-between-restcontroller-and-controller-annotations-spring-mvc-rest.html#axzz6sRNhPjm3)
-2. [Tracing API](https://github.com/open-telemetry/opentelemetry-specification/blob/0.3/specification/api-tracing.md#set-attributes)
-3. [lightstep 教學](https://opentelemetry.lightstep.com/java/)
-4. [opentelemetry JAVA 教學](https://opentelemetry.io/docs/java/manual_instrumentation/)
+opentelemetry 目錄是配置，分散式追蹤的環境。而應用程式則是透過根目錄下的 docker-compose 進行配置，應用程式進行 image 建置時需要 opentelemetry-javaagent-all.jar 須至官方下載。
 
 # Opentelemtry
 ## Opentelemtry 介紹
@@ -273,3 +270,9 @@ private final Tracer tracer = GlobalOpenTelemetry.getTracer(NoteServiceImp.class
     ]
 }
 ```
+## 參考資源
+
+1. [@Controller vs @RestController](https://javarevisited.blogspot.com/2017/08/difference-between-restcontroller-and-controller-annotations-spring-mvc-rest.html#axzz6sRNhPjm3)
+2. [Tracing API](https://github.com/open-telemetry/opentelemetry-specification/blob/0.3/specification/api-tracing.md#set-attributes)
+3. [lightstep 教學](https://opentelemetry.lightstep.com/java/)
+4. [opentelemetry JAVA 教學](https://opentelemetry.io/docs/java/manual_instrumentation/)
