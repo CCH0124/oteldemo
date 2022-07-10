@@ -1,5 +1,8 @@
 opentelemetry 目錄是配置，分散式追蹤的環境。而應用程式則是透過根目錄下的 docker-compose 進行配置，應用程式進行 image 建置時需要 opentelemetry-javaagent-all.jar 須至官方下載。
-
+# API 
+```bash
+$ curl -XPOST 192.168.133.140:8000/api/notes -H "Content-Type: application/json" -d '{"title": "spring", "content": "spring"}'
+```
 # Opentelemtry
 ## Opentelemtry 介紹
 官方說 OpenTelemetry is a collection of tools, APIs, and SDKs. You can use it to instrument, generate, collect, and export telemetry data (metrics, logs, and traces) for analysis in order to understand your software's performance and behavior.
